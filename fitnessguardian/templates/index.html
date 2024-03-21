@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ML Prediction</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Enter Input Features:</h2>
+        <form id="predictionForm">
+            <label for="timestamp">Timestamp (YYYY-MM-DD HH:MM:SS):</label>
+            <input type="text" id="timestamp" name="timestamp" required>
+            <br>
+            <input type="submit" id="predictButton" value="Predict"> <!-- Added id to the predict button -->
+        </form>
+        <div id="predictionResult"></div>
+    </div>
+    <script>
+        $(document).ready(function(){
+            // Function to format current date and time as YYYY-MM-DD HH:MM:SS
+            function getCurrentTimestamp() {
+                var now = new Date();
+                var year = now.getFullYear();
+                var month = (now.getMonth() + 1).toString().padStart(2, '0');
+                var day = now.getDate().toString().padStart(2, '0');
+                var hours = now.getHours().toString().padStart(2, '0');
+                var minutes = now.getMinutes().toString().padStart(2, '0');
+                var seconds = now.getSeconds().toString().padStart(2, '0');
+                return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds;
+            }
+
+            // Automatically fill the input field with current timestamp
+            $('#timestamp').val(getCurrentTimestamp());
+
+            // Event listener for the predict button
+            $('#predictButton').click(function(event){
+                event.preventDefault();
+                var timestamp = $('#timestamp').val();
+                $.ajax({
+                    type: 'POST',
+                    url: '/predict',
+                    data: {
+                        timestamp: timestamp
+                    },
+                    success: function(response){
+                        $('#predictionResult').html('<h2>Prediction Result:</h2><p>Heartbeat: ' + response.Heartbeat + '</p><p>SpO2: ' + response.SpO2 + '</p><p>Temperature: ' + response.Temperature + '</p>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
